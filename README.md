@@ -1,8 +1,12 @@
 ## PURE Backend
 
+#### Documentation
+
+[Apiary Docs](http://docs.purebackend.apiary.io/#)
+
 #### Getting Started for development
 
-* Install Modules
+* Install server dependencies
 
 ```sh
 npm install
@@ -14,7 +18,7 @@ npm install
 cp .env.example .env
 ```
 
-* Run the app
+* Run the development app
 
 ```sh
 gulp start:dev
