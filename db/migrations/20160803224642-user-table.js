@@ -21,12 +21,9 @@ module.exports = {
               allowNull: false
           },
           token: {
-              type:      Sequelize.UUID,
+              type:      Sequelize.STRING,
               allowNull: false,
-              unique:    true,
-              validate:  {
-                  isUUID: 4
-              }
+              unique:    true
           },
           firstName: {
               type:      Sequelize.STRING,

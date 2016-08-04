@@ -1,3 +1,5 @@
+'use strict';
+
 /*===============================
  =            MODULES            =
  ===============================*/
@@ -14,7 +16,7 @@ const plugins = require('gulp-load-plugins')();
 gulp.task('start:dev', () => {
     plugins.nodemon({
         script: 'src/server.js',
-        env: { 'NODE_ENV': 'development'}
+        env: {'NODE_ENV': 'development'}
     }).on('restart', () => {
         console.log('Restarted');
     })

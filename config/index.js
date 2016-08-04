@@ -37,7 +37,8 @@ class Environment {
 
         this.session = {
             url: env.session.url,
-            secret: env.session.secret
+            secret: env.session.secret,
+            jwtSecret: env.session.jwtSecret
         };
     }
 }

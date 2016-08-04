@@ -8,6 +8,7 @@ const uuid = require('node-uuid');
 const session = require('express-session');
 const passport = require('passport');
 const sessionConfig = require('../../config').session;
+const _ = require('lodash');
 
 const helmet = require('helmet');
 const hpp = require('hpp');
@@ -20,7 +21,19 @@ const compression = require('compression');
 const RedisStore = require('connect-redis')(session);
 const SessionStore = new RedisStore({url: sessionConfig.url});
 
+const log = require('./logging');
+const passportMiddleware = require('./passport');
+
 /*=====  End of MODULES  ======*/
+
+/*===============================
+ =            MODELS             =
+ ===============================*/
+
+const Models = require('../components/models/schemas');
+const Users = Models.Users;
+
+/*=====  End of MODELS  ======*/
 
 module.exports = function Middleware(app) {
 
@@ -84,5 +97,7 @@ module.exports = function Middleware(app) {
     app.use(compression());
 
     /*====== End of SERVER MIDDLEWARE ======*/
+
+    passportMiddleware(app);
 
 };
