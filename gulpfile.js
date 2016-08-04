@@ -16,6 +16,6 @@ requireDir('./tasks');
  =        MAIN TASKS           =
  =============================*/
 
-gulp.task('default', [ 'nsp' , 'lint' ]);
+gulp.task('test', [ 'nsp' , 'lint' ]);
 
 /*=====  End of MAIN TASKS  ======*/
