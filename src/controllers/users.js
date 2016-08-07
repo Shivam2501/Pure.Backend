@@ -24,7 +24,7 @@ const Models = require('../components/models/schemas');
 module.exports = class UserController {
 
   constructor() {
-    this.Users = Models.Users;
+      this.Users = Models.Users;
   }
 
   signup(req, res) {
@@ -40,13 +40,13 @@ module.exports = class UserController {
 
   login(req, res) {
       log.info('Login Successfully');
-      return handles.SUCCESS(res, 'User Logged in Successfully', _.omit(req.user, rules.UserOmitFields));
+      return handles.SUCCESS(res, 'User Logged in Successfully', req.user.token);
   }
 
   logout(req, res) {
       req.session.regenerate(err => {
           log.debug(`Logout Successful for User: ${req.user.email}`);
-          res.redirect('/logout/success');
+          return handles.SUCCESS(res, 'User Logged Out Successfully');
       });
   }
 

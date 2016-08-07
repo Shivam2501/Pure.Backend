@@ -29,7 +29,7 @@ module.exports = (req, res, next) => {
 
     if(!req.headers && !req.headers.authorization) {
         log.error('Access Token is Invalid');
-        return handles.UNAUTHORIZED(res, 'Access Token is Invalid', null);
+        return handles.UNAUTHORIZED(res, 'Access Token is required', null);
     } else {
         const parts = req.headers.authorization.split(' ');
         if(parts.length === 2) {
@@ -40,7 +40,7 @@ module.exports = (req, res, next) => {
                     if(err) {
                         return handles.UNAUTHORIZED(res, 'JWT Token is Invalid', null);
                     } else {
-                        req.user.token = token;
+                        req.token= credentials;
                         return next();
                     }
                 })

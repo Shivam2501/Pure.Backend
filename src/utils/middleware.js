@@ -4,6 +4,7 @@
  =            MODULES            =
  ===============================*/
 
+const express = require('express');
 const uuid = require('node-uuid');
 const session = require('express-session');
 const passport = require('passport');
@@ -46,19 +47,14 @@ module.exports = function Middleware(app) {
         genid: req => {
             return uuid.v4();
         },
-        resave:            true,
-        rolling:           true,
+        resave:            false,
         saveUninitialized: false,
         store: SessionStore,
         secret: sessionConfig.secret
     };
 
-    app.use(session(sessionOptions));
-
-    app.use(passport.initialize());
-    app.use(passport.session());
-
     /*====== End of SESSION MIDDLEWARE ======*/
+
 
     /*==============================================
      =              SECURITY MIDDLEWARE              =
@@ -93,10 +89,41 @@ module.exports = function Middleware(app) {
     app.use(bodyParser.urlencoded({ extended: false }));
     /* Returns request body as JSON */
     app.use(bodyParser.json());
+    /* Establishes an Express Session */
+    app.use(session(sessionOptions));
+    /* Imports Passport Middleware */
+    app.use(passport.initialize());
+    /* Manages the same Cookie Session */
+    app.use(passport.session());
     /* GZIP everything */
     app.use(compression());
 
     /*====== End of SERVER MIDDLEWARE ======*/
+
+    /*==============================================
+     =              PASSPORT SESSION                 =
+     ===============================================*/
+
+    passport.serializeUser((user, done) => {
+        done(null, user.token);
+    });
+
+    passport.deserializeUser((token, done) => {
+        Users.findOne({
+            where: { token: token }
+        }).then(user => {
+            if(user) {
+                done(null, _.omit(user.toJSON(), 'password'));
+            } else {
+                done(null, {});
+            }
+        }).catch(err => {
+            log.error('Access Token is invalid');
+            done(null, {});
+        });
+    });
+
+    /*====== End of PASSPORT SESSION ======*/
 
     passportMiddleware(app);
 

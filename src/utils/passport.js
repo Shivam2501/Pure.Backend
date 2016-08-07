@@ -29,31 +29,6 @@ const Users = Models.Users;
 module.exports = function Passport(app) {
 
     /*==============================================
-     =              PASSPORT SESSION                 =
-     ===============================================*/
-
-    passport.serializeUser((user, done) => {
-        done(null, user.token);
-    });
-
-    passport.deserializeUser((token, done) => {
-        Users.findOne({
-            where: { token: token }
-        }).then(user => {
-            if(user) {
-                done(null, _.omit(user.toJSON(), 'password'));
-            } else {
-                done(null, {});
-            }
-        }).catch(err => {
-            log.error('Access Token is invalid');
-            done(null, {});
-        });
-    });
-
-    /*====== End of PASSPORT SESSION ======*/
-
-    /*==============================================
      =            PASSPORT LOCAL STRATEGY            =
      ===============================================*/
 
@@ -65,7 +40,6 @@ module.exports = function Passport(app) {
             where: {email: username}
         }).then(user => {
             if(user) {
-
                 if(passwordEncrypt.compare(password, user.get('password'))) {
                     user.set('token', jwt.issue(username)).save().then(() => {
                         return done(null, { id: user.get('id'), token: user.get('token') }, { messge: 'Success' });
@@ -73,9 +47,9 @@ module.exports = function Passport(app) {
                         return done(null, false, {message: 'Unable to issue token'});
                     })
                 } else {
+                    log.error('Invalid password');
                     return done(null, false, {message: 'Incorrect Password'});
                 }
-
             } else {
                 return done(null, false, {message: `Cannot find User with email: ${username}`});
             }
