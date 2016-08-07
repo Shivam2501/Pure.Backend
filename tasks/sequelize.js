@@ -13,6 +13,14 @@ const plugins = require('gulp-load-plugins')();
  =       SEQUELIZE TASKS       =
  =============================*/
 
+
+/** Runs Sequelize migrations */
+gulp.task('migrate:create', plugins.shell.task([
+    'sequelize migration:create'
+], {
+    env: {'NODE_ENV': 'development'}
+}));
+
 /** Runs Sequelize migrations */
 gulp.task('migrate', plugins.shell.task([
     'sequelize db:migrate'

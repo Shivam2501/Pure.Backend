@@ -13,12 +13,14 @@ const sequelize = require('../../../utils/database');
  ===============================*/
 
 const Users = require('./users');
+const EmailVerifications = require('./emailVerifications');
 
 /*=====  End of MODELS  ======*/
 
 class Models {
     constructor() {
         this.Users = Users(sequelize);
+        this.EmailVerifications = EmailVerifications(sequelize);
     }
 }
 

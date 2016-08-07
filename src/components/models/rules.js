@@ -7,7 +7,7 @@ module.exports = {
 
     UserSignup: {
         email: ['required', 'email'],
-        password: 'required',
+        password: ['required', 'minLength:5'],
         role: 'required'
     },
 

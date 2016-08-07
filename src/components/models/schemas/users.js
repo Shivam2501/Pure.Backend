@@ -8,6 +8,14 @@ const Sequelize = require('sequelize');
 
 /*=====  End of MODULES  ======*/
 
+/*===============================
+ =            MODELS             =
+ ===============================*/
+
+const emailVerification = require('./emailVerifications');
+
+/*=====  End of MODELS  ======*/
+
 module.exports = function Users(sequelize) {
 
     const tablename = 'users';
@@ -61,6 +69,8 @@ module.exports = function Users(sequelize) {
     }, {
         timestamps: true
     });
+
+    User.hasOne(emailVerification(sequelize), { foreignKey: 'user_id' });
 
     return User;
 };

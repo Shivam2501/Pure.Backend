@@ -11,8 +11,9 @@ const log = require('../../utils/logging');
 /*=====  End of MODULES  ======*/
 
 /**
- * Middleware filter to verify an active user is provided
- * @param {JSON} rules rule to check against
+ * Check if body has the required elements from the rules
+ * @param rules rule to check against
+ * @returns {function} call next middleware or return error
  */
 module.exports = function checkJSON(rules) {
     return (req, res, next) => {

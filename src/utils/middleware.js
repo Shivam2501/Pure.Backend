@@ -5,7 +5,6 @@
  ===============================*/
 
 const express = require('express');
-const uuid = require('node-uuid');
 const session = require('express-session');
 const passport = require('passport');
 const sessionConfig = require('../../config').session;
@@ -24,6 +23,7 @@ const SessionStore = new RedisStore({url: sessionConfig.url});
 
 const log = require('./logging');
 const passportMiddleware = require('./passport');
+const uuid = require('../components/services/uuid');
 
 /*=====  End of MODULES  ======*/
 
@@ -44,10 +44,9 @@ module.exports = function Middleware(app) {
 
     const sessionOptions = {
         name: 'PURE.sid',
-        genid: req => {
-            return uuid.v4();
-        },
-        resave:            false,
+        genid: uuid,
+        resave: false,
+        rolling: true,
         saveUninitialized: false,
         store: SessionStore,
         secret: sessionConfig.secret
