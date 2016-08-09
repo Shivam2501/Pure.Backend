@@ -25,7 +25,7 @@ const Users = Models.Users;
  * @param  {Function} next filter chain
  */
 module.exports = (req, res, next) => {
-    if(!req.isAuthenticated()) {
+    if (!req.isAuthenticated()) {
         log.error('Session not found');
         return handles.UNAUTHORIZED(res, 'Session not found', null);
     } else {

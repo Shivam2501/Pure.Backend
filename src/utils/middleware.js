@@ -85,7 +85,7 @@ module.exports = function Middleware(app) {
     /* parses cookies */
     app.use(cookieParser());
     /* Parses the request body */
-    app.use(bodyParser.urlencoded({ extended: false }));
+    app.use(bodyParser.urlencoded({extended: false}));
     /* Returns request body as JSON */
     app.use(bodyParser.json());
     /* Establishes an Express Session */
@@ -109,9 +109,9 @@ module.exports = function Middleware(app) {
 
     passport.deserializeUser((token, done) => {
         Users.findOne({
-            where: { token: token }
+            where: {token: token}
         }).then(user => {
-            if(user) {
+            if (user) {
                 done(null, _.omit(user.toJSON(), 'password'));
             } else {
                 done(null, {});

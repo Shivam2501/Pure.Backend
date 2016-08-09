@@ -39,10 +39,10 @@ module.exports = function Passport(app) {
         Users.findOne({
             where: {email: username}
         }).then(user => {
-            if(user) {
-                if(passwordEncrypt.compare(password, user.get('password'))) {
+            if (user) {
+                if (passwordEncrypt.compare(password, user.get('password'))) {
                     user.set('token', jwt.issue(username)).save().then(() => {
-                        return done(null, { id: user.get('id'), token: user.get('token') }, { messge: 'Success' });
+                        return done(null, {id: user.get('id'), token: user.get('token')}, {messge: 'Success'});
                     }).catch(err => {
                         return done(null, false, {message: 'Unable to issue token'});
                     })
@@ -55,7 +55,7 @@ module.exports = function Passport(app) {
             }
         }).catch(err => {
             log.error('Invalid email');
-            return done(null, false, { message: err });
+            return done(null, false, {message: err});
         })
     });
 

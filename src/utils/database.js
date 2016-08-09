@@ -21,9 +21,9 @@ class Database {
             dbConfig.password,
             _.assignIn({host: dbConfig.host, dialect: dbConfig.dialect}, {
                 pool: {
-                    max:    10,
-                    min:    2,
-                    idle:   0
+                    max: 10,
+                    min: 2,
+                    idle: 0
                 }
             })
         );

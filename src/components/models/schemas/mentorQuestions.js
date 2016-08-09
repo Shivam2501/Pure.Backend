@@ -8,36 +8,27 @@ const Sequelize = require('sequelize');
 
 /*=====  End of MODULES  ======*/
 
-module.exports = function EmailVerifications(sequelize) {
+module.exports = function MentorQuestions(sequelize) {
 
-    const tablename = 'emailVerifications';
+    const tablename = 'mentorQuestions';
 
-    const EmailVerification = sequelize.define(tablename, {
+    const MentorQuestion = sequelize.define(tablename, {
         id: {
             type: Sequelize.BIGINT,
             autoIncrement: true,
             primaryKey: true
         },
-        'user_id': {
+        'mentor_id': {
             type: Sequelize.BIGINT,
             allowNull: false,
             references: {
-                model: 'users',
+                model: 'mentors',
                 key: 'id'
             }
         },
-        token: {
-            type: Sequelize.UUID,
-            allowNull: false,
-            unique: true,
-            validate: {
-                isUUID: 4
-            }
-        },
-        validEmail: {
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
+        question: {
+            type: Sequelize.TEXT,
+            allowNull: false
         },
         createdAt: {
             type: Sequelize.DATE,
@@ -53,5 +44,5 @@ module.exports = function EmailVerifications(sequelize) {
         timestamps: true
     });
 
-    return EmailVerification;
+    return MentorQuestion;
 };

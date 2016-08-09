@@ -13,6 +13,8 @@ const Sequelize = require('sequelize');
  ===============================*/
 
 const emailVerification = require('./emailVerifications');
+const resetPassword = require('./resetPasswords');
+const mentor = require('./mentors');
 
 /*=====  End of MODELS  ======*/
 
@@ -22,55 +24,57 @@ module.exports = function Users(sequelize) {
 
     const User = sequelize.define(tablename, {
         id: {
-            type:          Sequelize.BIGINT,
+            type: Sequelize.BIGINT,
             autoIncrement: true,
-            primaryKey:    true
+            primaryKey: true
         },
         email: {
-            type:      Sequelize.STRING,
+            type: Sequelize.STRING,
             allowNull: false,
-            unique:    true,
-            validate:  {
+            unique: true,
+            validate: {
                 isEmail: true
             }
         },
         password: {
-            type:      Sequelize.STRING,
+            type: Sequelize.STRING,
             allowNull: false
         },
         token: {
-            type:      Sequelize.STRING,
+            type: Sequelize.STRING,
             allowNull: false,
-            unique:    true
+            unique: true
         },
         firstName: {
-            type:      Sequelize.STRING,
+            type: Sequelize.STRING,
             allowNull: true
         },
         lastName: {
-            type:      Sequelize.STRING,
+            type: Sequelize.STRING,
             allowNull: true
         },
         role: {
-            type:       Sequelize.ENUM,
-            values:     ['admin', 'mentee', 'mentor'],
-            allowNull:  false
+            type: Sequelize.ENUM,
+            values: ['admin', 'mentee', 'mentor'],
+            allowNull: false
         },
         createdAt: {
-            type:         Sequelize.DATE,
+            type: Sequelize.DATE,
             defaultValue: Sequelize.NOW,
-            allowNull:    false
+            allowNull: false
         },
         updatedAt: {
-            type:         Sequelize.DATE,
+            type: Sequelize.DATE,
             defaultValue: Sequelize.NOW,
-            allowNull:    false
+            allowNull: false
         }
     }, {
         timestamps: true
     });
 
-    User.hasOne(emailVerification(sequelize), { foreignKey: 'user_id' });
+    User.hasOne(emailVerification(sequelize), {foreignKey: 'user_id'});
+    User.hasOne(resetPassword(sequelize), {foreignKey: 'user_id'});
+    User.hasOne(mentor(sequelize), {foreignKey: 'user_id'});
 
     return User;
 };

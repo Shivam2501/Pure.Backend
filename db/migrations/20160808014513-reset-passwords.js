@@ -2,7 +2,7 @@
 
 module.exports = {
     up: function (queryInterface, Sequelize) {
-        return queryInterface.createTable('emailVerifications', {
+        return queryInterface.createTable('resetPasswords', {
             id: {
                 type: Sequelize.BIGINT,
                 autoIncrement: true,
@@ -24,11 +24,6 @@ module.exports = {
                     isUUID: 4
                 }
             },
-            validEmail: {
-                type: Sequelize.BOOLEAN,
-                allowNull: false,
-                defaultValue: false
-            },
             createdAt: {
                 type: Sequelize.DATE,
                 defaultValue: Sequelize.NOW,
@@ -45,6 +40,6 @@ module.exports = {
     },
 
     down: function (queryInterface, Sequelize) {
-        return queryInterface.dropTable('emailVerifications');
+        return queryInterface.dropTable('resetPasswords');
     }
 };

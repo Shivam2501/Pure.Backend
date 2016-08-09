@@ -27,20 +27,20 @@ const Users = Models.Users;
  */
 module.exports = (req, res, next) => {
 
-    if(!req.headers && !req.headers.authorization) {
+    if (!req.headers && !req.headers.authorization) {
         log.error('Access Token is Invalid');
         return handles.UNAUTHORIZED(res, 'Access Token is required', null);
     } else {
         const parts = req.headers.authorization.split(' ');
-        if(parts.length === 2) {
+        if (parts.length === 2) {
             const scheme = parts[0];
             const credentials = parts[1];
             if (/^Bearer$/i.test(scheme)) {
                 jwt.verify(credentials, (err, token) => {
-                    if(err) {
+                    if (err) {
                         return handles.UNAUTHORIZED(res, 'JWT Token is Invalid', null);
                     } else {
-                        req.token= credentials;
+                        req.token = credentials;
                         return next();
                     }
                 })

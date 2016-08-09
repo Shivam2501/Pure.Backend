@@ -18,9 +18,9 @@ const sessionConfig = require('../../../config').session;
  * @return {String} generated token
  */
 exports.issue = payload => {
-  return jwt.sign({ payload }, sessionConfig.jwtSecret, {
-      expiresIn: 15 * 24 * 60
-  });
+    return jwt.sign({payload}, sessionConfig.jwtSecret, {
+        expiresIn: 15 * 24 * 60
+    });
 };
 
 /**

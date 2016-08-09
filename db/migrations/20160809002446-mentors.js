@@ -2,41 +2,35 @@
 
 module.exports = {
     up: function (queryInterface, Sequelize) {
-        return queryInterface.createTable('users', {
+        return queryInterface.createTable('mentors', {
             id: {
                 type: Sequelize.BIGINT,
                 autoIncrement: true,
                 primaryKey: true
             },
-            email: {
-                type: Sequelize.STRING,
+            'user_id': {
+                type: Sequelize.BIGINT,
                 allowNull: false,
-                unique: true,
-                validate: {
-                    isEmail: true
+                references: {
+                    model: 'users',
+                    key: 'id'
                 }
             },
-            password: {
-                type: Sequelize.STRING,
-                allowNull: false
-            },
-            token: {
-                type: Sequelize.STRING,
-                allowNull: false,
-                unique: true
-            },
-            firstName: {
-                type: Sequelize.STRING,
+            aboutMe: {
+                type: Sequelize.TEXT,
                 allowNull: true
             },
-            lastName: {
-                type: Sequelize.STRING,
+            project: {
+                type: Sequelize.TEXT,
                 allowNull: true
             },
-            role: {
-                type: Sequelize.ENUM,
-                values: ['admin', 'mentee', 'mentor'],
-                allowNull: false
+            coursework: {
+                type: Sequelize.TEXT,
+                allowNull: true
+            },
+            term: {
+                type: Sequelize.STRING,
+                allowNull: true
             },
             createdAt: {
                 type: Sequelize.DATE,
@@ -54,6 +48,6 @@ module.exports = {
     },
 
     down: function (queryInterface, Sequelize) {
-        return queryInterface.dropTable('users');
+        return queryInterface.dropTable('mentors');
     }
 };

@@ -83,7 +83,21 @@ module.exports = function UserRouter() {
      * @param req express request
      * @param res express response
      */
-    router.put('/update-password', checkit({ password: ['required', 'minLength:5'] }), jwtAuth, sessionAuth, user.updatePassword.bind(user));
+    router.put('/update-password', checkit({password: ['required', 'minLength:5']}), jwtAuth, sessionAuth, user.updatePassword.bind(user));
+
+    /**
+     * Send reset password email to the user
+     * @param req express request
+     * @param res express response
+     */
+    router.get('/forgot-password/:email', user.forgotPassword.bind(user));
+
+    /**
+     * Reset the password using the token
+     * @param req express request
+     * @param res express response
+     */
+    router.get('/reset-password/:token', user.resetPassword.bind(user));
 
     /*=====  End of ROUTES  ======*/
 

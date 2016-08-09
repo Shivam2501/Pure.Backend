@@ -16,15 +16,15 @@ const logConfig = require('../../config').logging;
 class Logging {
     constructor() {
         this.instance = winston.add(winston.transports.File, {
-            filename:  logConfig.filename,
-            colorize:  true,
-            json:      true,
-            maxFiles:  5,
-            maxsize:   10485760,
-            levels:    {
+            filename: logConfig.filename,
+            colorize: true,
+            json: true,
+            maxFiles: 5,
+            maxsize: 10485760,
+            levels: {
                 debug: 0,
-                info:  1,
-                warn:  2,
+                info: 1,
+                warn: 2,
                 error: 3
             }
         });

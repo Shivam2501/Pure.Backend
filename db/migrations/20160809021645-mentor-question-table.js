@@ -2,32 +2,23 @@
 
 module.exports = {
     up: function (queryInterface, Sequelize) {
-        return queryInterface.createTable('emailVerifications', {
+        return queryInterface.createTable('mentorQuestions', {
             id: {
                 type: Sequelize.BIGINT,
                 autoIncrement: true,
                 primaryKey: true
             },
-            'user_id': {
+            'mentor_id': {
                 type: Sequelize.BIGINT,
                 allowNull: false,
                 references: {
-                    model: 'users',
+                    model: 'mentors',
                     key: 'id'
                 }
             },
-            token: {
-                type: Sequelize.UUID,
-                allowNull: false,
-                unique: true,
-                validate: {
-                    isUUID: 4
-                }
-            },
-            validEmail: {
-                type: Sequelize.BOOLEAN,
-                allowNull: false,
-                defaultValue: false
+            question: {
+                type: Sequelize.TEXT,
+                allowNull: false
             },
             createdAt: {
                 type: Sequelize.DATE,
@@ -45,6 +36,6 @@ module.exports = {
     },
 
     down: function (queryInterface, Sequelize) {
-        return queryInterface.dropTable('emailVerifications');
+        return queryInterface.dropTable('mentorQuestions');
     }
 };

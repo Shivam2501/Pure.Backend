@@ -8,11 +8,11 @@ const Sequelize = require('sequelize');
 
 /*=====  End of MODULES  ======*/
 
-module.exports = function EmailVerifications(sequelize) {
+module.exports = function ResetPasswords(sequelize) {
 
-    const tablename = 'emailVerifications';
+    const tablename = 'resetPasswords';
 
-    const EmailVerification = sequelize.define(tablename, {
+    const ResetPassword = sequelize.define(tablename, {
         id: {
             type: Sequelize.BIGINT,
             autoIncrement: true,
@@ -34,11 +34,6 @@ module.exports = function EmailVerifications(sequelize) {
                 isUUID: 4
             }
         },
-        validEmail: {
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
-        },
         createdAt: {
             type: Sequelize.DATE,
             defaultValue: Sequelize.NOW,
@@ -53,5 +48,5 @@ module.exports = function EmailVerifications(sequelize) {
         timestamps: true
     });
 
-    return EmailVerification;
+    return ResetPassword;
 };
