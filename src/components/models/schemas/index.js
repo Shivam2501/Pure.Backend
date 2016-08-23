@@ -17,6 +17,12 @@ const EmailVerifications = require('./emailVerifications');
 const ResetPasswords = require('./resetPasswords');
 const Mentors = require('./mentors');
 const MentorQuestions = require('./mentorQuestions');
+const Mentees = require('./mentees');
+const CompletedCourses = require('./completedCourses');
+const ProgressCourses = require('./progressCourses');
+const MenteeSkills = require('./menteeSkills');
+const Applications = require('./applications');
+const Answers = require('./answers');
 
 /*=====  End of MODELS  ======*/
 
@@ -27,6 +33,12 @@ class Models {
         this.ResetPasswords = ResetPasswords(sequelize);
         this.Mentors = Mentors(sequelize);
         this.MentorQuestions = MentorQuestions(sequelize);
+        this.Mentees = Mentees(sequelize);
+        this.CompletedCourses = CompletedCourses(sequelize);
+        this.ProgressCourses = ProgressCourses(sequelize);
+        this.MenteeSkills = MenteeSkills(sequelize);
+        this.Applications = Applications(sequelize);
+        this.Answers = Answers(sequelize);
     }
 }
 

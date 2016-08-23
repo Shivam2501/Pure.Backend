@@ -30,6 +30,7 @@ module.exports = class UserController {
         this.EmailVerifications = Models.EmailVerifications;
         this.ResetPasswords = Models.ResetPasswords;
         this.Mentors = Models.Mentors;
+        this.Mentees = Models.Mentees;
     }
 
     /**
@@ -40,7 +41,7 @@ module.exports = class UserController {
      */
     _sendEmailVerificationMail(user, cb, errCb) {
 
-        // Remove the previous generated email so that the token is invalid
+        // Remove the previous generated email so that the previous token is invalid
         this.EmailVerifications.destroy({
             where: {user_id: user.id}
         });
@@ -49,7 +50,7 @@ module.exports = class UserController {
             user_id: user.id,
             token: uuid()
         }).then(emailVerf => {
-            log.info(`Email Verification sent to ${user.email}`);
+            log.info(`Email Verification sending to ${user.email}`);
             email(user.email, 'Please verify your email', `
             <p>Welcome to PURE Community. Please verify your email.</p><br/>
             <a href="http://localhost:3000/users/verify-email/${emailVerf.token}">Verify Email</a><br/>
@@ -72,7 +73,7 @@ module.exports = class UserController {
      */
     _sendPasswordResetMail(user, cb, errCb) {
 
-        // Remove the previous generated email so that the token is invalid
+        // Remove the previous generated email so that the previous token is invalid
         this.ResetPasswords.destroy({
             where: {user_id: user.id}
         });
@@ -97,6 +98,17 @@ module.exports = class UserController {
     }
 
     /**
+     * Handle Error in Signup
+     * @param user user created
+     * @param err error
+     */
+    _handleErrorSignup(user, err) {
+        log.error(err);
+        this.EmailVerifications.destroy({ where: {user_id: user.id} });
+        this.Users.destroy({ where: {id: user.id} });
+    }
+
+    /**
      * User sign up
      * @param req express request
      * @param res express response
@@ -114,12 +126,23 @@ module.exports = class UserController {
                     }).then(mentor => {
                         return handles.CREATED(res, 'Successfully created new Mentor', _.omit(user.toJSON(), rules.UserOmitFields));
                     }).catch(err => {
+                        this._handleErrorSignup(user, err);
                         return handles.BAD_REQUEST(res, 'Error in creating mentor profile', err);
                     })
-                } else {
+                } else if (req.body.role === 'mentee') {
+                    return this.Mentees.create({
+                        user_id: user.id
+                    }).then(mentee => {
+                        return handles.CREATED(res, 'Successfully created new Mentee', _.omit(user.toJSON(), rules.UserOmitFields));
+                    }).catch(err => {
+                        this._handleErrorSignup(user, err);
+                        return handles.BAD_REQUEST(res, 'Error in creating mentee profile', err);
+                    })
+                }else {
                     return handles.CREATED(res, 'Successfully created new User', _.omit(user.toJSON(), rules.UserOmitFields));
                 }
             }, (err) => {
+                this._handleErrorSignup(user, err);
                 return handles.BAD_REQUEST(res, 'Failed to send the verification Email', err);
             })
         }).catch(err => {

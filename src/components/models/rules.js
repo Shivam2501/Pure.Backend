@@ -8,6 +8,8 @@ module.exports = {
     UserSignup: {
         email: ['required', 'email'],
         password: ['required', 'minLength:5'],
+        firstName: 'required',
+        lastName: 'required',
         role: 'required'
     },
 
@@ -20,5 +22,23 @@ module.exports = {
         'id',
         'password',
         'token'
+    ],
+
+    MenteeFields: [
+        'netID',
+        'schoolYear',
+        'gpa',
+        'workExperience',
+        'researchGoal',
+        'term',
+        'major'
+    ],
+
+    MentorFields: [
+        'aboutMe',
+        'project',
+        'coursework',
+        'term',
+        'major'
     ]
 };

@@ -16,11 +16,11 @@ const answers = require('./answers');
 
 /*=====  End of MODELS  ======*/
 
-module.exports = function MentorQuestions(sequelize) {
+module.exports = function Applications(sequelize) {
 
-    const tablename = 'mentorQuestions';
+    const tablename = 'applications';
 
-    const MentorQuestion = sequelize.define(tablename, {
+    const Application = sequelize.define(tablename, {
         id: {
             type: Sequelize.BIGINT,
             autoIncrement: true,
@@ -34,13 +34,18 @@ module.exports = function MentorQuestions(sequelize) {
                 key: 'id'
             }
         },
-        question: {
-            type: Sequelize.TEXT,
-            allowNull: false
+        'mentee_id': {
+            type: Sequelize.BIGINT,
+            allowNull: false,
+            references: {
+                model: 'mentees',
+                key: 'id'
+            }
         },
-        required: {
-            type: Sequelize.BOOLEAN,
-            defaultValue: false,
+        status: {
+            type: Sequelize.ENUM,
+            values: ['ACCEPTED', 'DECLINED', 'PENDING', 'NOT_COMPLETED'],
+            defaultValue: 'NOT_COMPLETED',
             allowNull: false
         },
         createdAt: {
@@ -57,6 +62,7 @@ module.exports = function MentorQuestions(sequelize) {
         timestamps: true
     });
 
-    MentorQuestion.hasOne(answers(sequelize), {foreignKey: 'question_id'});
-    return MentorQuestion;
+    Application.hasMany(answers(sequelize), {foreignKey: 'application_id'});
+
+    return Application;
 };

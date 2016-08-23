@@ -15,6 +15,7 @@ const Sequelize = require('sequelize');
 const emailVerification = require('./emailVerifications');
 const resetPassword = require('./resetPasswords');
 const mentor = require('./mentors');
+const mentee = require('./mentees');
 
 /*=====  End of MODELS  ======*/
 
@@ -75,6 +76,7 @@ module.exports = function Users(sequelize) {
     User.hasOne(emailVerification(sequelize), {foreignKey: 'user_id'});
     User.hasOne(resetPassword(sequelize), {foreignKey: 'user_id'});
     User.hasOne(mentor(sequelize), {foreignKey: 'user_id'});
+    User.hasOne(mentee(sequelize), {foreignKey: 'user_id'});
 
     return User;
 };

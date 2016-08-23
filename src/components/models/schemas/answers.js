@@ -12,36 +12,37 @@ const Sequelize = require('sequelize');
  =            MODELS             =
  ===============================*/
 
-const answers = require('./answers');
-
 /*=====  End of MODELS  ======*/
 
-module.exports = function MentorQuestions(sequelize) {
+module.exports = function Answers(sequelize) {
 
-    const tablename = 'mentorQuestions';
+    const tablename = 'answers';
 
-    const MentorQuestion = sequelize.define(tablename, {
+    const Answer = sequelize.define(tablename, {
         id: {
             type: Sequelize.BIGINT,
             autoIncrement: true,
             primaryKey: true
         },
-        'mentor_id': {
+        'application_id': {
             type: Sequelize.BIGINT,
             allowNull: false,
             references: {
-                model: 'mentors',
+                model: 'applications',
                 key: 'id'
             }
         },
-        question: {
-            type: Sequelize.TEXT,
-            allowNull: false
+        'question_id': {
+            type: Sequelize.BIGINT,
+            allowNull: false,
+            references: {
+                model: 'mentorQuestions',
+                key: 'id'
+            }
         },
-        required: {
-            type: Sequelize.BOOLEAN,
-            defaultValue: false,
-            allowNull: false
+        answer: {
+            type: Sequelize.TEXT,
+            allowNull: true
         },
         createdAt: {
             type: Sequelize.DATE,
@@ -57,6 +58,5 @@ module.exports = function MentorQuestions(sequelize) {
         timestamps: true
     });
 
-    MentorQuestion.hasOne(answers(sequelize), {foreignKey: 'question_id'});
-    return MentorQuestion;
+    return Answer;
 };

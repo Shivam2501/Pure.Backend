@@ -15,44 +15,28 @@ const rules = require('../components/models/rules');
  =        CONTROLLERS            =
  ===============================*/
 
-const MentorController = require('../controllers/mentors');
+const MainController = require('../controllers/main');
 
 /*=====  End of CONTROLLERS  ======*/
 
-module.exports = function MentorRouter() {
+module.exports = function MainRouter() {
 
     const router = require('express').Router();
-    const mentor = new MentorController();
+    const main = new MainController();
 
     /*===============================
      =             ROUTES            =
      ===============================*/
 
     /**
-     * Return the logged in mentor
+     * Get all questions
      */
-    router.get('/mentor', mentor.getProfile.bind(mentor));
-
-
-    /**
-     * Update the logged in mentor
-     */
-    router.put('/mentor', mentor.updateProfile.bind(mentor));
+    router.get('/mentors/question/:id', main.getQuestions.bind(main));
 
     /**
-     * Create a new question
+     * Get all mentors by department for a term
      */
-    router.post('/question', checkit({question: ['required']}), mentor.addQuestion.bind(mentor));
-
-    /**
-     * Update a question by id
-     */
-    router.put('/question/:id', checkit({question: ['required']}), mentor.updateQuestion.bind(mentor));
-
-    /**
-     * Delete a question by id
-     */
-    router.delete('/question/:id', mentor.removeQuestion.bind(mentor));
+    router.get('/mentors/:term/:department', main.allMentors.bind(main));
 
     /*=====  End of ROUTES  ======*/
 

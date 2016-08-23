@@ -12,16 +12,18 @@ const Sequelize = require('sequelize');
  =            MODELS             =
  ===============================*/
 
-const mentorQuestion = require('./mentorQuestions');
+const completedCourse = require('./completedCourses');
+const progressCourse = require('./progressCourses');
+const menteeSkill = require('./menteeSkills');
 const application = require('./applications');
 
 /*=====  End of MODELS  ======*/
 
-module.exports = function Mentors(sequelize) {
+module.exports = function Mentees(sequelize) {
 
-    const tablename = 'mentors';
+    const tablename = 'mentees';
 
-    const Mentor = sequelize.define(tablename, {
+    const Mentee = sequelize.define(tablename, {
         id: {
             type: Sequelize.BIGINT,
             autoIncrement: true,
@@ -35,15 +37,24 @@ module.exports = function Mentors(sequelize) {
                 key: 'id'
             }
         },
-        aboutMe: {
+        netID: {
+            type: Sequelize.STRING,
+            allowNull: true
+        },
+        schoolYear: {
+            type: Sequelize.ENUM,
+            values: ['freshman', 'sophomore', 'junior', 'senior'],
+            allowNull: true
+        },
+        gpa: {
+            type: Sequelize.DOUBLE,
+            allowNull: true
+        },
+        workExperience: {
             type: Sequelize.TEXT,
             allowNull: true
         },
-        project: {
-            type: Sequelize.TEXT,
-            allowNull: true
-        },
-        coursework: {
+        researchGoal: {
             type: Sequelize.TEXT,
             allowNull: true
         },
@@ -69,8 +80,10 @@ module.exports = function Mentors(sequelize) {
         timestamps: true
     });
 
-    Mentor.hasMany(mentorQuestion(sequelize), {foreignKey: 'mentor_id'});
-    Mentor.hasMany(application(sequelize), {foreignKey: 'mentor_id'});
+    Mentee.hasMany(completedCourse(sequelize), {foreignKey: 'mentee_id'});
+    Mentee.hasMany(progressCourse(sequelize), {foreignKey: 'mentee_id'});
+    Mentee.hasMany(menteeSkill(sequelize), {foreignKey: 'mentee_id'});
+    Mentee.hasMany(application(sequelize), {foreignKey: 'mentee_id'});
 
-    return Mentor;
+    return Mentee;
 };

@@ -34,17 +34,7 @@ module.exports = class MentorController {
      * @returns {Promise} return response on success/error
      */
     getProfile(req, res) {
-        return this.Mentors.findOne({
-            where: {user_id: req.user.id}
-        }).then(mentor => {
-            if (mentor) {
-                return handles.SUCCESS(res, 'Mentor Profile returned Successfully', mentor.toJSON());
-            } else {
-                return handles.BAD_REQUEST(res, 'Mentor Profile not found', err);
-            }
-        }).catch(err => {
-            return handles.BAD_REQUEST(res, 'Mentor Profile not found', err);
-        })
+        return handles.SUCCESS(res, 'Mentor Profile returned Successfully', req.mentor);
     }
 
     /**
@@ -56,7 +46,7 @@ module.exports = class MentorController {
     updateProfile(req, res) {
         return this.Mentors.update(
             req.body,
-            {where: {user_id: req.user.id}}
+            {where: {id: req.mentor.id}}
         ).then(mentor => {
             return handles.SUCCESS(res, 'Mentor Profile Updated Successfully', mentor);
         }).catch(err => {
@@ -72,7 +62,11 @@ module.exports = class MentorController {
      * @returns {Promise} return response on success/error
      */
     addQuestion(req, res) {
-
+        return this.MentorQuestions.create(_.assign(req.body, {mentor_id: req.mentor.id})).then(mentor => {
+            return handles.SUCCESS(res, 'Mentor Question Successfully Created', mentor);
+        }).catch(err => {
+            return handles.BAD_REQUEST(res, 'Error in creating Question', err);
+        })
     }
 
     /**
@@ -82,7 +76,15 @@ module.exports = class MentorController {
      * @returns {Promise} return response on success/error
      */
     updateQuestion(req, res) {
-
+        return this.MentorQuestions.update(
+            req.body,
+            {where: {id: req.params.id}}
+        ).then(mentor => {
+            return handles.SUCCESS(res, 'Mentor Question Updated Successfully', mentor);
+        }).catch(err => {
+            log.error('Mentor Question not found.');
+            return handles.BAD_REQUEST(res, 'Mentor Question not found', err);
+        })
     }
 
     /**
@@ -92,16 +94,14 @@ module.exports = class MentorController {
      * @returns {Promise} return response on success/error
      */
     removeQuestion(req, res) {
-
-    }
-
-    /**
-     * Get all Questions
-     * @param req express request
-     * @param res express response
-     * @returns {Promise} return response on success/error
-     */
-    getQuestions(req, res) {
+        return this.MentorQuestions.destroy({
+            where: {id: req.params.id}
+        }).then(mentor => {
+            return handles.SUCCESS(res, 'Mentor Question Deleted Successfully', mentor);
+        }).catch(err => {
+            log.error('Mentor Question not found.');
+            return handles.BAD_REQUEST(res, 'Mentor Question not found', err);
+        })
 
     }
 

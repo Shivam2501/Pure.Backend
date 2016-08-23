@@ -1,0 +1,329 @@
+/**
+ * Created by shivambharuka on 8/9/16.
+ */
+'use strict';
+
+/*===============================
+ =            MODULES            =
+ ===============================*/
+
+const _ = require('lodash');
+const async = require('async');
+const handles = require('../components/services/response');
+const log = require('../utils/logging');
+const rules = require('../components/models/rules');
+
+/*=====  End of MODULES  ======*/
+
+/*===============================
+ =            MODELS             =
+ ===============================*/
+
+const Models = require('../components/models/schemas');
+
+/*=====  End of MODELS  ======*/
+
+module.exports = class MenteeController {
+
+    constructor() {
+        this.Users = Models.Users;
+        this.Mentees = Models.Mentees;
+        this.CompletedCourses = Models.CompletedCourses;
+        this.ProgressCourses = Models.ProgressCourses;
+        this.MenteeSkills = Models.MenteeSkills;
+        this.Applications = Models.Applications;
+        this.MentorQuestions = Models.MentorQuestions;
+        this.Answers = Models.Answers;
+    }
+
+    /**
+     * Get Mentor Profile
+     * @param req express request
+     * @param res express response
+     * @returns {Promise} return response on success/error
+     */
+    getProfile(req, res) {
+        return handles.SUCCESS(res, 'Mentee Profile returned Successfully', req.mentee);
+    }
+
+    /**
+     * Update Mentor Profile
+     * @param req express request
+     * @param res express response
+     * @returns {Promise} return response on success/error
+     */
+    updateProfile(req, res) {
+        return this.Mentees.update(
+            req.body,
+            {where: {id: req.mentee.id}}
+        ).then(mentee => {
+            return handles.SUCCESS(res, 'Mentee Profile Updated Successfully', mentee);
+        }).catch(err => {
+            log.error('Mentee Profile not found.');
+            return handles.BAD_REQUEST(res, 'Mentee Profile not found', err);
+        })
+    }
+
+    /**
+     * Return all the completed courses
+     * @param req express request
+     * @param res express response
+     * @returns {Promise} return response on success/error
+     */
+    getCompletedCourses(req, res) {
+        return this.CompletedCourses.findAll({
+            where: {mentee_id: req.mentee.id}
+        }).then(courses => {
+            return handles.SUCCESS(res, 'Courses Returned Successfully', courses);
+        }).catch(err => {
+            log.error('Courses not found.');
+            return handles.BAD_REQUEST(res, 'Courses not found', err);
+        })
+    }
+
+    /**
+     * Add a completed course
+     * @param req express request
+     * @param res express response
+     * @returns {Promise} return response on success/error
+     */
+    addCompletedCourse(req, res) {
+        return this.CompletedCourses.findOrCreate({
+            where: { course: req.body.course, mentee_id: req.mentee.id }
+        }).then(course => {
+            return handles.SUCCESS(res, 'Course Successfully Added', course);
+        }).catch(err => {
+            return handles.BAD_REQUEST(res, 'Error in adding course', err);
+        })
+    }
+
+    /**
+     * Delete a completed course
+     * @param req express request
+     * @param res express response
+     * @returns {Promise} return response on success/error
+     */
+    removeCompletedCourse(req, res) {
+        return this.CompletedCourses.destroy({
+            where: {id: req.params.id}
+        }).then(course => {
+            return handles.SUCCESS(res, 'Couse Removed Successfully', course);
+        }).catch(err => {
+            log.error('Course not found.');
+            return handles.BAD_REQUEST(res, 'Course not found', err);
+        })
+    }
+
+    /**
+     * Return all the courses in progress
+     * @param req express request
+     * @param res express response
+     * @returns {Promise} return response on success/error
+     */
+    getProgressCourses(req, res) {
+        return this.ProgressCourses.findAll({
+            where: {mentee_id: req.mentee.id}
+        }).then(courses => {
+            return handles.SUCCESS(res, 'Courses Returned Successfully', courses);
+        }).catch(err => {
+            log.error('Courses not found.');
+            return handles.BAD_REQUEST(res, 'Courses not found', err);
+        })
+    }
+
+    /**
+     * Add a course in progress
+     * @param req express request
+     * @param res express response
+     * @returns {Promise} return response on success/error
+     */
+    addProgressCourse(req, res) {
+        return this.ProgressCourses.findOrCreate({
+            where: { course: req.body.course, mentee_id: req.mentee.id }
+        }).then(course => {
+            return handles.SUCCESS(res, 'Course Successfully Added', course);
+        }).catch(err => {
+            return handles.BAD_REQUEST(res, 'Error in adding course', err);
+        })
+    }
+
+    /**
+     * Delete a course in progress
+     * @param req express request
+     * @param res express response
+     * @returns {Promise} return response on success/error
+     */
+    removeProgressCourse(req, res) {
+        return this.ProgressCourses.destroy({
+            where: {id: req.params.id}
+        }).then(course => {
+            return handles.SUCCESS(res, 'Couse Removed Successfully', course);
+        }).catch(err => {
+            log.error('Course not found.');
+            return handles.BAD_REQUEST(res, 'Course not found', err);
+        })
+    }
+
+    /**
+     * Return all the skills
+     * @param req express request
+     * @param res express response
+     * @returns {Promise} return response on success/error
+     */
+    getSkills(req, res) {
+        return this.MenteeSkills.findAll({
+            where: {mentee_id: req.mentee.id}
+        }).then(courses => {
+            return handles.SUCCESS(res, 'Skills Returned Successfully', courses);
+        }).catch(err => {
+            log.error('Skills not found.');
+            return handles.BAD_REQUEST(res, 'Skills not found', err);
+        })
+    }
+
+    /**
+     * Add a skill
+     * @param req express request
+     * @param res express response
+     * @returns {Promise} return response on success/error
+     */
+    addSkill(req, res) {
+        return this.MenteeSkills.findOrCreate({
+            where: { skill: req.body.skill, mentee_id: req.mentee.id }
+        }).then(course => {
+            return handles.SUCCESS(res, 'Skill Successfully Added', course);
+        }).catch(err => {
+            return handles.BAD_REQUEST(res, 'Error in adding skill', err);
+        })
+    }
+
+    /**
+     * Delete a skill
+     * @param req express request
+     * @param res express response
+     * @returns {Promise} return response on success/error
+     */
+    removeSkill(req, res) {
+        return this.MenteeSkills.destroy({
+            where: {id: req.params.id}
+        }).then(course => {
+            return handles.SUCCESS(res, 'Skill Removed Successfully', course);
+        }).catch(err => {
+            log.error('Skill not found.');
+            return handles.BAD_REQUEST(res, 'Skill not found', err);
+        })
+    }
+
+    createApplication(req, res) {
+        return this.Applications.findOrCreate({
+            where: { mentor_id: req.params.mentorID, mentee_id: req.mentee.id }
+        }).spread((app, created) => {
+            const appInstance = app.get({ plain: true });
+            // Get all the questions for the mentor whose application is created.
+            this.MentorQuestions.findAll({
+                where: {mentor_id: req.params.mentorID}
+            }).then(questions => {
+                async.each(questions, (question, callback) => {
+                    this.Answers.findOrCreate({
+                        where: {
+                            application_id: appInstance.id,
+                            question_id: question.get('id')
+                        }
+                    }).then(() => {
+                        callback();
+                    }).catch(err => {
+                        callback('Question could not be created');
+                    })
+                }, (err) => {
+                    if(err) {
+                        this.Answers.destroy({ where: {application_id: appInstance.id}});
+                        this.Applications.destroy({ where: {id: appInstance.id}});
+                        return handles.BAD_REQUEST(res, 'Application questions not created', err);
+                    }
+                    else {
+                        return handles.SUCCESS(res, 'Application created Successfully', app);
+                    }
+                })
+            }).catch(err => {
+                log.error(`Error in creating new application questions: ${err}`);
+                this.Answers.destroy({ where: {application_id: appInstance.id}});
+                this.Applications.destroy({ where: {id: appInstance.id}});
+                return handles.BAD_REQUEST(res, 'Application questions not created', err);
+            });
+        }).catch(err => {
+            log.error(`Error in creating new application: ${err}`);
+            return handles.BAD_REQUEST(res, 'Application not created', err);
+        })
+    }
+
+    removeApplication(req, res) {
+        this.Answers.destroy({ where: {application_id: req.params.appID}});
+        this.Applications.destroy({ where: {id: req.params.appID}});
+        return handles.SUCCESS(res, 'Application deleted Successfully', {});
+    }
+
+    getAllApplications(req, res) {
+        return this.Applications.findAll({
+            where: {mentee_id: req.mentee.id}
+        }).then(applications => {
+            return handles.SUCCESS(res, 'Applications Returned Successfully', applications);
+        }).catch(err => {
+            log.error('Applications not found.');
+            return handles.BAD_REQUEST(res, 'Applications not found', err);
+        })
+    }
+
+    getApplication(req, res) {
+        return this.Applications.findOne({
+            where: {mentee_id: req.mentee.id, id: req.params.id},
+            include: [
+                {
+                    model: this.Answers,
+                    where: {
+                        application_id: req.params.id
+                    }
+                }
+            ]
+        }).then(application => {
+            return handles.SUCCESS(res, 'Application Returned Successfully', application);
+        }).catch(err => {
+            log.error('Application not found.');
+            return handles.BAD_REQUEST(res, 'Application not found', err);
+        })
+    }
+
+    addAnswer(req, res) {
+        return this.Answers.update(
+            {answer: req.body.answer},
+            {where: {application_id: req.params.appID, question_id: req.params.questionID} }
+        ).then(answer => {
+            return handles.SUCCESS(res, 'Answer successfully saved', answer);
+        }).catch(err => {
+            log.error(`Error in saving answer: ${err}`);
+            return handles.BAD_REQUEST(res, 'Answer not saved', err);
+        }).catch(err => {
+            log.error(`Error in saving answer: ${err}`);
+            return handles.BAD_REQUEST(res, 'Answer not saved', err);
+        })
+    }
+
+    getAnswer(req, res) {
+        return this.Answers.findOne({
+            where: {application_id: req.params.appID, question_id: req.params.questionID}
+        }).then(answer => {
+            if(answer) {
+                return handles.SUCCESS(res, 'Answer returned Successfully', answer);
+            } else {
+                return handles.SUCCESS(res, 'Answer is not created yet', {});
+            }
+        }).catch(err => {
+            log.error(`Error in sending answer: ${err}`);
+            return handles.BAD_REQUEST(res, 'Error in sending answer', err);
+        })
+    }
+
+    submitApplication(req, res) {
+
+    }
+
+};
