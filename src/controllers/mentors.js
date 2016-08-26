@@ -25,6 +25,8 @@ module.exports = class MentorController {
         this.Users = Models.Users;
         this.Mentors = Models.Mentors;
         this.MentorQuestions = Models.MentorQuestions;
+        this.Applications = Models.Applications;
+        this.Answers = Models.Answers;
     }
 
     /**
@@ -112,7 +114,14 @@ module.exports = class MentorController {
      * @returns {Promise} return response on success/error
      */
     receivedApplications(req, res) {
-
+        return this.Applications.findAll({
+            where: {mentor_id: req.mentor.id}
+        }).then(applications => {
+            return handles.SUCCESS(res, 'Applications Returned Successfully', applications);
+        }).catch(err => {
+            log.error('Applications not found.');
+            return handles.BAD_REQUEST(res, 'Applications not found', err);
+        })
     }
 
     /**
@@ -122,6 +131,14 @@ module.exports = class MentorController {
      * @returns {Promise} return response on success/error
      */
     updateApplicationStatus(req, res) {
-
+        return this.Applications.update(
+            {status: req.body.status},
+            {where: {id: req.params.appID}}
+        ).then(app => {
+            return handles.SUCCESS(res, 'Application updated successfully', app);
+        }).catch(err => {
+            log.error(`Error in updating application: ${err}`);
+            return handles.BAD_REQUEST(res, 'Error in updating application', err);
+        })
     }
 };

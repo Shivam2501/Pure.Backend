@@ -214,6 +214,23 @@ module.exports = class MenteeController {
         })
     }
 
+    /**
+     * Delete Application instance if failure happens in creating questions
+     * @param err error
+     * @param appInstance application created
+     */
+    _handleApplicationError(err, appInstance) {
+        log.error(`Error in creating new application questions: ${err}`);
+        this.Answers.destroy({ where: {application_id: appInstance.id}});
+        this.Applications.destroy({ where: {id: appInstance.id}});
+    }
+
+    /**
+     * Create a new application
+     * @param req express request
+     * @param res express response
+     * @returns {Promise} return response on success/error
+     */
     createApplication(req, res) {
         return this.Applications.findOrCreate({
             where: { mentor_id: req.params.mentorID, mentee_id: req.mentee.id }
@@ -230,14 +247,13 @@ module.exports = class MenteeController {
                             question_id: question.get('id')
                         }
                     }).then(() => {
-                        callback();
+                        callback(); // no parameters for success
                     }).catch(err => {
-                        callback('Question could not be created');
+                        callback('Question could not be created'); // error message passed on failure
                     })
                 }, (err) => {
                     if(err) {
-                        this.Answers.destroy({ where: {application_id: appInstance.id}});
-                        this.Applications.destroy({ where: {id: appInstance.id}});
+                        this._handleApplicationError(err, appInstance);
                         return handles.BAD_REQUEST(res, 'Application questions not created', err);
                     }
                     else {
@@ -245,9 +261,7 @@ module.exports = class MenteeController {
                     }
                 })
             }).catch(err => {
-                log.error(`Error in creating new application questions: ${err}`);
-                this.Answers.destroy({ where: {application_id: appInstance.id}});
-                this.Applications.destroy({ where: {id: appInstance.id}});
+                this._handleApplicationError(err, appInstance);
                 return handles.BAD_REQUEST(res, 'Application questions not created', err);
             });
         }).catch(err => {
@@ -256,12 +270,24 @@ module.exports = class MenteeController {
         })
     }
 
+    /**
+     * remove a created application
+     * @param req express request
+     * @param res express response
+     * @returns {Promise} return response on success/error
+     */
     removeApplication(req, res) {
         this.Answers.destroy({ where: {application_id: req.params.appID}});
         this.Applications.destroy({ where: {id: req.params.appID}});
         return handles.SUCCESS(res, 'Application deleted Successfully', {});
     }
 
+    /**
+     * Return all applications created by a mentee
+     * @param req express request
+     * @param res express response
+     * @returns {Promise} return response on success/error
+     */
     getAllApplications(req, res) {
         return this.Applications.findAll({
             where: {mentee_id: req.mentee.id}
@@ -273,14 +299,20 @@ module.exports = class MenteeController {
         })
     }
 
+    /**
+     * Return a created application by ID
+     * @param req express request
+     * @param res express response
+     * @returns {Promise} return response on success/error
+     */
     getApplication(req, res) {
         return this.Applications.findOne({
-            where: {mentee_id: req.mentee.id, id: req.params.id},
+            where: {mentee_id: req.mentee.id, id: req.params.appID},
             include: [
                 {
                     model: this.Answers,
                     where: {
-                        application_id: req.params.id
+                        application_id: req.params.appID
                     }
                 }
             ]
@@ -292,21 +324,41 @@ module.exports = class MenteeController {
         })
     }
 
+    /**
+     * Add an answer for a created application question
+     * @param req express request
+     * @param res express response
+     * @returns {Promise} return response on success/error
+     */
     addAnswer(req, res) {
-        return this.Answers.update(
-            {answer: req.body.answer},
-            {where: {application_id: req.params.appID, question_id: req.params.questionID} }
-        ).then(answer => {
-            return handles.SUCCESS(res, 'Answer successfully saved', answer);
+        return this.Applications.findOne({
+            where: {id: req.params.appID}
+        }).then(application => {
+            if(application.status === 'NOT_COMPLETED') {
+                return this.Answers.update(
+                    {answer: req.body.answer},
+                    {where: {application_id: req.params.appID, question_id: req.params.questionID} }
+                ).then(answer => {
+                    return handles.SUCCESS(res, 'Answer successfully saved', answer);
+                }).catch(err => {
+                    log.error(`Error in saving answer: ${err}`);
+                    return handles.BAD_REQUEST(res, 'Answer not saved', err);
+                })
+            } else {
+                return handles.BAD_REQUEST(res, 'Application already submitted', {});
+            }
         }).catch(err => {
-            log.error(`Error in saving answer: ${err}`);
-            return handles.BAD_REQUEST(res, 'Answer not saved', err);
-        }).catch(err => {
-            log.error(`Error in saving answer: ${err}`);
-            return handles.BAD_REQUEST(res, 'Answer not saved', err);
+            log.error('Application not found.');
+            return handles.BAD_REQUEST(res, 'Application not found', err);
         })
     }
 
+    /**
+     * Get an answer for a created application question
+     * @param req express request
+     * @param res express response
+     * @returns {Promise} return response on success/error
+     */
     getAnswer(req, res) {
         return this.Answers.findOne({
             where: {application_id: req.params.appID, question_id: req.params.questionID}
@@ -322,8 +374,22 @@ module.exports = class MenteeController {
         })
     }
 
+    /**
+     * Submit a created application which makes its status "PENDING"
+     * @param req express request
+     * @param res express response
+     * @returns {Promise} return response on success/error
+     */
     submitApplication(req, res) {
-
+        return this.Applications.update(
+            {status: 'PENDING'},
+            {where: {id: req.params.appID}}
+        ).then(app => {
+            return handles.SUCCESS(res, 'Application submitted successfully', app);
+        }).catch(err => {
+            log.error(`Error in submitting application: ${err}`);
+            return handles.BAD_REQUEST(res, 'Error in sending application', err);
+        })
     }
 
 };

@@ -54,6 +54,16 @@ module.exports = function MentorRouter() {
      */
     router.delete('/question/:id', mentor.removeQuestion.bind(mentor));
 
+    /**
+     * See all received applications
+     */
+    router.get('/application', mentor.receivedApplications.bind(mentor));
+
+    /**
+     * Update an application status
+     */
+    router.post('/application/:appID', mentor.updateApplicationStatus.bind(mentor));
+
     /*=====  End of ROUTES  ======*/
 
     return router;

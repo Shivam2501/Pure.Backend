@@ -101,7 +101,7 @@ module.exports = function MentorRouter() {
     /**
      * Return an application by ID
      */
-    router.get('/mentee/application/:id', mentee.getApplication.bind(mentee));
+    router.get('/mentee/application/:appID', mentee.getApplication.bind(mentee));
 
     /**
      * Add an answer for Mentor Question
@@ -112,6 +112,11 @@ module.exports = function MentorRouter() {
      * Get an answer for Mentor Question
      */
     router.get('/mentee/application/:appID/:questionID', mentee.getAnswer.bind(mentee));
+
+    /**
+     * Submit an application
+     */
+    router.get('/mentee/submit/application/:appID', mentee.submitApplication.bind(mentee));
 
     /*=====  End of ROUTES  ======*/
 
