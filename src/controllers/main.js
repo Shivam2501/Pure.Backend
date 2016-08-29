@@ -33,6 +33,12 @@ module.exports = class MainController {
         this.Error = new error();
     }
 
+    /**
+     * Get all Mentors by department
+     * @param req express request
+     * @param res express response
+     * @returns {Promise} return response on success/error
+     */
     allMentors(req, res) {
         let query = {
             include: [

@@ -299,8 +299,11 @@ module.exports = class MenteeController {
      * @returns {Promise} return response on success/error
      */
     getApplication(req, res) {
-        return this.Applications.findOne({
-            where: {mentee_id: req.mentee.id, id: req.params.appID},
+        let query = {
+            where: {
+                mentee_id: req.mentee.id,
+                id: req.params.appID
+            },
             include: [
                 {
                     model: this.Answers,
@@ -309,7 +312,9 @@ module.exports = class MenteeController {
                     }
                 }
             ]
-        }).then(application => {
+        };
+
+        return this.Applications.findOne(query).then(application => {
             return handles.SUCCESS(res, 'Application Returned Successfully', application);
         }).catch(err => {
             this.Error.handler(res, err, 'Mentee: Applications not found');

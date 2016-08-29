@@ -23,6 +23,9 @@ const ProgressCourses = require('./progressCourses');
 const MenteeSkills = require('./menteeSkills');
 const Applications = require('./applications');
 const Answers = require('./answers');
+const Timelines = require('./timeline');
+const TimelineEvents = require('./timelineEvent');
+const Announcements = require('./announcement');
 
 /*=====  End of MODELS  ======*/
 
@@ -39,6 +42,9 @@ class Models {
         this.MenteeSkills = MenteeSkills(sequelize);
         this.Applications = Applications(sequelize);
         this.Answers = Answers(sequelize);
+        this.Timelines = Timelines(sequelize);
+        this.TimelineEvents = TimelineEvents(sequelize);
+        this.Announcements = Announcements(sequelize);
     }
 }
 

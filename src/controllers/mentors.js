@@ -113,9 +113,21 @@ module.exports = class MentorController {
      * @returns {Promise} return response on success/error
      */
     receivedApplications(req, res) {
-        return this.Applications.findAll({
-            where: {mentor_id: req.mentor.id, status: {$not: "NOT_COMPLETED"}}
-        }).then(applications => {
+        let query = {
+            where: {
+                mentor_id: req.mentor.id,
+                status: {
+                    $not: "NOT_COMPLETED"
+                }
+            },
+            include: [
+                {
+                    model: this.Answers
+                }
+            ]
+        };
+
+        return this.Applications.findAll(query).then(applications => {
             return handles.SUCCESS(res, 'Applications Returned Successfully', applications);
         }).catch(err => {
             this.Error.handler(res, err, 'Mentor: Applications not found');

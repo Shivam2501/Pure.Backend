@@ -20,6 +20,7 @@ const UserRouter = require('./users');
 const MentorRouter = require('./mentors');
 const MenteeRouter = require('./mentees');
 const MainRouter = require('./main');
+const AdminRouter = require('./admin');
 
 /*=====  End of ROUTERS  ======*/
 
@@ -29,6 +30,7 @@ module.exports = function Routes(app) {
     const mentorRoutes = MentorRouter();
     const menteeRoutes = MenteeRouter();
     const mainRoutes = MainRouter();
+    const adminRoutes = AdminRouter();
 
     /**
      * User Profile Routes
@@ -49,4 +51,9 @@ module.exports = function Routes(app) {
      * Mentee Dashboard Routes
      */
     app.use('/mentees', jwtAuth, sessionAuth, menteeAuth, menteeRoutes);
+
+    /**
+     * Admin Dashboard Routes
+     */
+    app.use('/admin', jwtAuth, sessionAuth, adminRoutes);
 };
