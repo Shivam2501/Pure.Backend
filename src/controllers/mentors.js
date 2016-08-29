@@ -8,6 +8,7 @@ const _ = require('lodash');
 const handles = require('../components/services/response');
 const log = require('../utils/logging');
 const rules = require('../components/models/rules');
+const error = require('./error');
 
 /*=====  End of MODULES  ======*/
 
@@ -27,6 +28,7 @@ module.exports = class MentorController {
         this.MentorQuestions = Models.MentorQuestions;
         this.Applications = Models.Applications;
         this.Answers = Models.Answers;
+        this.Error = new error();
     }
 
     /**
@@ -52,8 +54,7 @@ module.exports = class MentorController {
         ).then(mentor => {
             return handles.SUCCESS(res, 'Mentor Profile Updated Successfully', mentor);
         }).catch(err => {
-            log.error('Mentor Profile not found.');
-            return handles.BAD_REQUEST(res, 'Mentor Profile not found', err);
+            this.Error.handler(res, err, 'Mentor: Profile could not be found');
         })
     }
 
@@ -67,7 +68,7 @@ module.exports = class MentorController {
         return this.MentorQuestions.create(_.assign(req.body, {mentor_id: req.mentor.id})).then(mentor => {
             return handles.SUCCESS(res, 'Mentor Question Successfully Created', mentor);
         }).catch(err => {
-            return handles.BAD_REQUEST(res, 'Error in creating Question', err);
+            this.Error.handler(res, err, 'Mentor: Answer could not be added');
         })
     }
 
@@ -84,8 +85,7 @@ module.exports = class MentorController {
         ).then(mentor => {
             return handles.SUCCESS(res, 'Mentor Question Updated Successfully', mentor);
         }).catch(err => {
-            log.error('Mentor Question not found.');
-            return handles.BAD_REQUEST(res, 'Mentor Question not found', err);
+            this.Error.handler(res, err, 'Mentor: Question could not be updated');
         })
     }
 
@@ -101,8 +101,7 @@ module.exports = class MentorController {
         }).then(mentor => {
             return handles.SUCCESS(res, 'Mentor Question Deleted Successfully', mentor);
         }).catch(err => {
-            log.error('Mentor Question not found.');
-            return handles.BAD_REQUEST(res, 'Mentor Question not found', err);
+            this.Error.handler(res, err, 'Mentor: Question Not Deleted Successfully');
         })
 
     }
@@ -115,12 +114,11 @@ module.exports = class MentorController {
      */
     receivedApplications(req, res) {
         return this.Applications.findAll({
-            where: {mentor_id: req.mentor.id}
+            where: {mentor_id: req.mentor.id, status: {$not: "NOT_COMPLETED"}}
         }).then(applications => {
             return handles.SUCCESS(res, 'Applications Returned Successfully', applications);
         }).catch(err => {
-            log.error('Applications not found.');
-            return handles.BAD_REQUEST(res, 'Applications not found', err);
+            this.Error.handler(res, err, 'Mentor: Applications not found');
         })
     }
 
@@ -133,12 +131,15 @@ module.exports = class MentorController {
     updateApplicationStatus(req, res) {
         return this.Applications.update(
             {status: req.body.status},
-            {where: {id: req.params.appID}}
+            {where: {id: req.params.appID, mentor_id: req.mentor.id}}
         ).then(app => {
-            return handles.SUCCESS(res, 'Application updated successfully', app);
+            if(app[0]) {
+                return handles.SUCCESS(res, 'Application updated successfully', app);
+            } else {
+                this.Error.handler(res, {}, 'Mentor: Application could not be found');
+            }
         }).catch(err => {
-            log.error(`Error in updating application: ${err}`);
-            return handles.BAD_REQUEST(res, 'Error in updating application', err);
+            this.Error.handler(res, err, 'Mentor: Application could not be updated');
         })
     }
 };

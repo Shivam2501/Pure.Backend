@@ -12,6 +12,7 @@ const async = require('async');
 const handles = require('../components/services/response');
 const log = require('../utils/logging');
 const rules = require('../components/models/rules');
+const error = require('./error');
 
 /*=====  End of MODULES  ======*/
 
@@ -34,6 +35,7 @@ module.exports = class MenteeController {
         this.Applications = Models.Applications;
         this.MentorQuestions = Models.MentorQuestions;
         this.Answers = Models.Answers;
+        this.Error = new error();
     }
 
     /**
@@ -59,8 +61,7 @@ module.exports = class MenteeController {
         ).then(mentee => {
             return handles.SUCCESS(res, 'Mentee Profile Updated Successfully', mentee);
         }).catch(err => {
-            log.error('Mentee Profile not found.');
-            return handles.BAD_REQUEST(res, 'Mentee Profile not found', err);
+            this.Error.handler(res, err, 'Mentee: Profile not Updated');
         })
     }
 
@@ -76,8 +77,7 @@ module.exports = class MenteeController {
         }).then(courses => {
             return handles.SUCCESS(res, 'Courses Returned Successfully', courses);
         }).catch(err => {
-            log.error('Courses not found.');
-            return handles.BAD_REQUEST(res, 'Courses not found', err);
+            this.Error.handler(res, err, 'Mentee: Courses not returned');
         })
     }
 
@@ -93,7 +93,7 @@ module.exports = class MenteeController {
         }).then(course => {
             return handles.SUCCESS(res, 'Course Successfully Added', course);
         }).catch(err => {
-            return handles.BAD_REQUEST(res, 'Error in adding course', err);
+            this.Error.handler(res, err, 'Mentee: Course not added');
         })
     }
 
@@ -109,8 +109,7 @@ module.exports = class MenteeController {
         }).then(course => {
             return handles.SUCCESS(res, 'Couse Removed Successfully', course);
         }).catch(err => {
-            log.error('Course not found.');
-            return handles.BAD_REQUEST(res, 'Course not found', err);
+            this.Error.handler(res, err, 'Mentee: Course not removed');
         })
     }
 
@@ -126,8 +125,7 @@ module.exports = class MenteeController {
         }).then(courses => {
             return handles.SUCCESS(res, 'Courses Returned Successfully', courses);
         }).catch(err => {
-            log.error('Courses not found.');
-            return handles.BAD_REQUEST(res, 'Courses not found', err);
+            this.Error.handler(res, err, 'Mentee: Course not returned');
         })
     }
 
@@ -143,7 +141,7 @@ module.exports = class MenteeController {
         }).then(course => {
             return handles.SUCCESS(res, 'Course Successfully Added', course);
         }).catch(err => {
-            return handles.BAD_REQUEST(res, 'Error in adding course', err);
+            this.Error.handler(res, err, 'Mentee: Course not added');
         })
     }
 
@@ -159,8 +157,7 @@ module.exports = class MenteeController {
         }).then(course => {
             return handles.SUCCESS(res, 'Couse Removed Successfully', course);
         }).catch(err => {
-            log.error('Course not found.');
-            return handles.BAD_REQUEST(res, 'Course not found', err);
+            this.Error.handler(res, err, 'Mentee: Course not removed');
         })
     }
 
@@ -176,8 +173,7 @@ module.exports = class MenteeController {
         }).then(courses => {
             return handles.SUCCESS(res, 'Skills Returned Successfully', courses);
         }).catch(err => {
-            log.error('Skills not found.');
-            return handles.BAD_REQUEST(res, 'Skills not found', err);
+            this.Error.handler(res, err, 'Mentee: Skills not found');
         })
     }
 
@@ -193,7 +189,7 @@ module.exports = class MenteeController {
         }).then(course => {
             return handles.SUCCESS(res, 'Skill Successfully Added', course);
         }).catch(err => {
-            return handles.BAD_REQUEST(res, 'Error in adding skill', err);
+            this.Error.handler(res, err, 'Mentee: Adding Skill');
         })
     }
 
@@ -209,8 +205,7 @@ module.exports = class MenteeController {
         }).then(course => {
             return handles.SUCCESS(res, 'Skill Removed Successfully', course);
         }).catch(err => {
-            log.error('Skill not found.');
-            return handles.BAD_REQUEST(res, 'Skill not found', err);
+            this.Error.handler(res, err, 'Mentee: Removing Skill');
         })
     }
 
@@ -254,7 +249,7 @@ module.exports = class MenteeController {
                 }, (err) => {
                     if(err) {
                         this._handleApplicationError(err, appInstance);
-                        return handles.BAD_REQUEST(res, 'Application questions not created', err);
+                        this.Error.handler(res, err, 'Mentee: Application Question not returned');
                     }
                     else {
                         return handles.SUCCESS(res, 'Application created Successfully', app);
@@ -262,11 +257,10 @@ module.exports = class MenteeController {
                 })
             }).catch(err => {
                 this._handleApplicationError(err, appInstance);
-                return handles.BAD_REQUEST(res, 'Application questions not created', err);
+                this.Error.handler(res, err, 'Mentee: Application answers not created');
             });
         }).catch(err => {
-            log.error(`Error in creating new application: ${err}`);
-            return handles.BAD_REQUEST(res, 'Application not created', err);
+            this.Error.handler(res, err, 'Mentee: Creating new Application');
         })
     }
 
@@ -294,8 +288,7 @@ module.exports = class MenteeController {
         }).then(applications => {
             return handles.SUCCESS(res, 'Applications Returned Successfully', applications);
         }).catch(err => {
-            log.error('Applications not found.');
-            return handles.BAD_REQUEST(res, 'Applications not found', err);
+            this.Error.handler(res, err, 'Mentee: Applications not found');
         })
     }
 
@@ -319,8 +312,7 @@ module.exports = class MenteeController {
         }).then(application => {
             return handles.SUCCESS(res, 'Application Returned Successfully', application);
         }).catch(err => {
-            log.error('Application not found.');
-            return handles.BAD_REQUEST(res, 'Application not found', err);
+            this.Error.handler(res, err, 'Mentee: Applications not found');
         })
     }
 
@@ -341,15 +333,13 @@ module.exports = class MenteeController {
                 ).then(answer => {
                     return handles.SUCCESS(res, 'Answer successfully saved', answer);
                 }).catch(err => {
-                    log.error(`Error in saving answer: ${err}`);
-                    return handles.BAD_REQUEST(res, 'Answer not saved', err);
+                    this.Error.handler(res, err, 'Mentee: Saving answer');
                 })
             } else {
-                return handles.BAD_REQUEST(res, 'Application already submitted', {});
+                this.Error.handler(res, err, 'Mentee: Application already submitted');
             }
         }).catch(err => {
-            log.error('Application not found.');
-            return handles.BAD_REQUEST(res, 'Application not found', err);
+            this.Error.handler(res, err, 'Mentee: Application not found');
         })
     }
 
@@ -369,8 +359,7 @@ module.exports = class MenteeController {
                 return handles.SUCCESS(res, 'Answer is not created yet', {});
             }
         }).catch(err => {
-            log.error(`Error in sending answer: ${err}`);
-            return handles.BAD_REQUEST(res, 'Error in sending answer', err);
+            this.Error.handler(res, err, 'Mentee: Returning Answer');
         })
     }
 
@@ -387,8 +376,7 @@ module.exports = class MenteeController {
         ).then(app => {
             return handles.SUCCESS(res, 'Application submitted successfully', app);
         }).catch(err => {
-            log.error(`Error in submitting application: ${err}`);
-            return handles.BAD_REQUEST(res, 'Error in sending application', err);
+            this.Error.handler(res, err, 'Mentee: Submitting Application');
         })
     }
 

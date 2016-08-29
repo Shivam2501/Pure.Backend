@@ -12,6 +12,7 @@ const log = require('../utils/logging');
 const rules = require('../components/models/rules');
 const jwt = require('../components/services/jwToken');
 const email = require('../components/services/mail');
+const error = require('./error');
 
 /*=====  End of MODULES  ======*/
 
@@ -31,6 +32,7 @@ module.exports = class UserController {
         this.ResetPasswords = Models.ResetPasswords;
         this.Mentors = Models.Mentors;
         this.Mentees = Models.Mentees;
+        this.Error = new error();
     }
 
     /**
@@ -127,7 +129,7 @@ module.exports = class UserController {
                         return handles.CREATED(res, 'Successfully created new Mentor', _.omit(user.toJSON(), rules.UserOmitFields));
                     }).catch(err => {
                         this._handleErrorSignup(user, err);
-                        return handles.BAD_REQUEST(res, 'Error in creating mentor profile', err);
+                        this.Error.handler(res, err, 'User: Creating');
                     })
                 } else if (req.body.role === 'mentee') {
                     return this.Mentees.create({
@@ -136,17 +138,17 @@ module.exports = class UserController {
                         return handles.CREATED(res, 'Successfully created new Mentee', _.omit(user.toJSON(), rules.UserOmitFields));
                     }).catch(err => {
                         this._handleErrorSignup(user, err);
-                        return handles.BAD_REQUEST(res, 'Error in creating mentee profile', err);
+                        this.Error.handler(res, err, 'User: Creating');
                     })
                 }else {
                     return handles.CREATED(res, 'Successfully created new User', _.omit(user.toJSON(), rules.UserOmitFields));
                 }
             }, (err) => {
                 this._handleErrorSignup(user, err);
-                return handles.BAD_REQUEST(res, 'Failed to send the verification Email', err);
+                this.Error.handler(res, err, 'User: Creating');
             })
         }).catch(err => {
-            return handles.BAD_REQUEST(res, 'Failed to create new User', err);
+            this.Error.handler(res, err, 'User: Creating');
         })
     }
 
@@ -164,11 +166,10 @@ module.exports = class UserController {
             if (affectedCount) {
                 return handles.SUCCESS(res, 'User Email Verified Successfully', {});
             } else {
-                log.error('Token not found.');
-                return handles.BAD_REQUEST(res, 'Token is not valid', err);
+                this.Error.handler(res, {}, 'User: Token not Valid');
             }
         }).catch(err => {
-            return handles.BAD_REQUEST(res, 'Token is not valid', err);
+            this.Error.handler(res, err, 'User: Token not Valid');
         })
     }
 
@@ -189,10 +190,10 @@ module.exports = class UserController {
                 log.info('Login Successful');
                 return handles.SUCCESS(res, 'User Logged in Successfully', req.user.token);
             } else {
-                return handles.BAD_REQUEST(res, 'Email not verified', {});
+                this.Error.handler(res, {}, 'User: Email not Verified');
             }
         }).catch(err => {
-            return handles.BAD_REQUEST(res, 'Email Verification Not Found', err);
+            this.Error.handler(res, err, 'User: Verification email not found');
         })
     }
 
@@ -221,10 +222,10 @@ module.exports = class UserController {
             return this._sendEmailVerificationMail(user, (email) => {
                 return handles.CREATED(res, 'Successfully sent new verification Email', _.omit(user.toJSON(), rules.UserOmitFields));
             }, (err) => {
-                return handles.BAD_REQUEST(res, 'Failed to send the verification Email', err);
+                this.Error.handler(res, err, 'User: Sending Verification Mail');
             })
         }).catch(err => {
-            return handles.BAD_REQUEST(res, 'Failed to retrieve user. Please check your email.', err);
+            this.Error.handler(res, err, 'User: Finding User');
         })
     }
 
@@ -259,9 +260,9 @@ module.exports = class UserController {
      */
     updateUser(req, res) {
         if (req.body.password) {
-            return handles.BAD_REQUEST(res, 'Password field can be updated using /update-password', {});
+            this.Error.handler(res, {}, 'User: Password field can be updated using /update-password');
         } else if (req.body.token || req.body.id) {
-            return handles.BAD_REQUEST(res, 'Token/ID cannot be updated', {});
+            this.Error.handler(res, {}, 'User: Token cannot be found');
         } else {
             return this.Users.update(
                 _.omit(req.body, rules.UserOmitFields),
@@ -269,8 +270,7 @@ module.exports = class UserController {
             ).then(user => {
                 return handles.SUCCESS(res, 'User Updated Successfully', user);
             }).catch(err => {
-                log.error('User not found.');
-                return handles.BAD_REQUEST(res, 'User not found', err);
+                this.Error.handler(res, err, 'User: User not Found');
             })
         }
     }
@@ -288,8 +288,7 @@ module.exports = class UserController {
         ).then(user => {
             return handles.SUCCESS(res, 'User Password Updated Successfully', user);
         }).catch(err => {
-            log.error('User not found.');
-            return handles.BAD_REQUEST(res, 'User not found', err);
+            this.Error.handler(res, err, 'User: User not Found');
         })
     }
 
@@ -306,11 +305,10 @@ module.exports = class UserController {
             return this._sendPasswordResetMail(user, (email) => {
                 return handles.CREATED(res, 'Successfully sent the Reset Password Email', {});
             }, (err) => {
-                return handles.BAD_REQUEST(res, 'Failed to send the Reset Password Email', err);
+                this.Error.handler(res, err, 'User: Failed to send the reset password email');
             })
         }).catch(err => {
-            log.error('User not found.');
-            return handles.BAD_REQUEST(res, 'User not found', err);
+            this.Error.handler(res, err, 'User: User not Found');
         })
     }
 
@@ -330,14 +328,13 @@ module.exports = class UserController {
                 }).then(user => {
                     return res.redirect(`http://localhost:3000/app?token=${user.token}`);
                 }).catch(err => {
-                    return handles.BAD_REQUEST(res, 'User not found', err);
+                    this.Error.handler(res, err, 'User: User not Found');
                 });
             } else {
-                log.error('Token not found');
-                return handles.BAD_REQUEST(res, 'Token not found', err);
+                this.Error.handler(res, {}, 'User: Token not Found');
             }
         }).catch(err => {
-            return handles.BAD_REQUEST(res, 'Token not found', err);
+            this.Error.handler(res, err, 'User: Token not Found');
         })
     }
 

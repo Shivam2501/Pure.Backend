@@ -11,6 +11,7 @@ const _ = require('lodash');
 const handles = require('../components/services/response');
 const log = require('../utils/logging');
 const rules = require('../components/models/rules');
+const error = require('./error');
 
 /*=====  End of MODULES  ======*/
 
@@ -29,6 +30,7 @@ module.exports = class MainController {
         this.Mentees = Models.Mentees;
         this.MentorQuestions = Models.MentorQuestions;
         this.Mentors = Models.Mentors;
+        this.Error = new error();
     }
 
     allMentors(req, res) {
@@ -47,8 +49,7 @@ module.exports = class MainController {
         return this.Users.findAll(query).then(mentors => {
             return handles.SUCCESS(res, `Mentor in ${req.params.department} returned Successfully`, mentors);
         }).catch(err => {
-            log.error(`Error in returning mentor profiles: ${err}`);
-            return hanldes.BAD_REQUEST(res, 'Mentor Profiles not returned', err);
+            this.Error.handler(res, err, 'Main: Mentors not returned');
         })
     }
 
@@ -64,8 +65,7 @@ module.exports = class MainController {
         }).then(questions => {
             return handles.SUCCESS(res, 'Mentor Questions Returned Successfully', questions);
         }).catch(err => {
-            log.error('Mentor not found.');
-            return handles.BAD_REQUEST(res, 'Mentor not found', err);
+            this.Error.handler(res, err, 'Main: Mentor Questions not found');
         })
     }
 
